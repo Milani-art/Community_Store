@@ -1,0 +1,331 @@
+{
+	"info": {
+		"_postman_id": "a8f3b123-4567-89ab-cdef-1234567890ab",
+		"name": "Community Store API (PRM370)",
+		"description": "Postman API Collection for testing Community-Store Spring Boot REST backend with MySQL Database.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080/api",
+			"type": "string"
+		},
+		{
+			"key": "authToken",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Authentication",
+			"item": [
+				{
+					"name": "Login - Student",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.success && jsonData.data && jsonData.data.token) {",
+									"    pm.collectionVariables.set('authToken', jsonData.data.token);",
+									"    console.log('JWT Token saved:', jsonData.data.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"student@campus.ac.za\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Login - Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.success && jsonData.data && jsonData.data.token) {",
+									"    pm.collectionVariables.set('authToken', jsonData.data.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@communitystore.org\",\n  \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"newstudent@campus.ac.za\",\n  \"password\": \"password123\",\n  \"fullName\": \"Alex Morgan\",\n  \"role\": \"STUDENT\",\n  \"institutionOrBusiness\": \"Faculty of Business\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "register"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Marketplace Products",
+			"item": [
+				{
+					"name": "Get All Products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products",
+							"host": ["{{baseUrl}}"],
+							"path": ["products"]
+						}
+					}
+				},
+				{
+					"name": "Get Product By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["products", "1"]
+						}
+					}
+				},
+				{
+					"name": "Filter By Category (TEXTBOOKS)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/category/TEXTBOOKS",
+							"host": ["{{baseUrl}}"],
+							"path": ["products", "category", "TEXTBOOKS"]
+						}
+					}
+				},
+				{
+					"name": "Search Products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/search?q=laptop",
+							"host": ["{{baseUrl}}"],
+							"path": ["products", "search"],
+							"query": [
+								{
+									"key": "q",
+									"value": "laptop"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Product (Auth Required)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Calculus 2nd Edition Textbook\",\n  \"description\": \"Clean textbook, perfect condition for Math module.\",\n  \"price\": 400.00,\n  \"category\": \"TEXTBOOKS\",\n  \"conditionName\": \"Used - Excellent\",\n  \"ecoFriendly\": true,\n  \"location\": \"Main Library\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products",
+							"host": ["{{baseUrl}}"],
+							"path": ["products"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Bulletin Board",
+			"item": [
+				{
+					"name": "Get All Bulletin Posts",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/bulletin",
+							"host": ["{{baseUrl}}"],
+							"path": ["bulletin"]
+						}
+					}
+				},
+				{
+					"name": "Create Bulletin Post (Auth Required)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Campus Hackathon 2026 Announcement\",\n  \"content\": \"Register your team for the annual campus software hackathon! Great prizes and vendor sponsorships.\",\n  \"postType\": \"EVENT\",\n  \"tags\": \"Hackathon,Coding,CampusEvent\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/bulletin",
+							"host": ["{{baseUrl}}"],
+							"path": ["bulletin"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "4. Orders & Checkout",
+			"item": [
+				{
+					"name": "Create Order (Checkout)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"items\": [\n    {\n      \"productId\": 1,\n      \"quantity\": 1\n    }\n  ],\n  \"paymentMethod\": \"SNAPSCAN\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/orders",
+							"host": ["{{baseUrl}}"],
+							"path": ["orders"]
+						}
+					}
+				},
+				{
+					"name": "Get User Orders",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/orders/my-orders",
+							"host": ["{{baseUrl}}"],
+							"path": ["orders", "my-orders"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Admin Operations",
+			"item": [
+				{
+					"name": "Get Pending Verifications (Admin Auth)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/users/pending-verification",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "pending-verification"]
+						}
+					}
+				},
+				{
+					"name": "Approve User Verification (Admin Auth)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/users/4/verify",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "4", "verify"]
+						}
+					}
+				}
+			]
+		}
+	]
+}

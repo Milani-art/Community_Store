@@ -7,6 +7,38 @@ spring:
   application:
     name: community-store-backend
 
+  profiles:
+    active: mysql
+
+---
+# MySQL Profile for MySQL Workbench & Production
+spring:
+  config:
+    activate:
+      on-profile: mysql
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/community_store_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: password # Change to your MySQL Workbench root password if different
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+---
+# Optional H2 In-Memory Profile for testing
+spring:
+  config:
+    activate:
+      on-profile: h2
+
   datasource:
     url: jdbc:h2:mem:communitystoredb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     driverClassName: org.h2.Driver
@@ -17,18 +49,13 @@ spring:
     console:
       enabled: true
       path: /h2-console
-      settings:
-        web-allow-others: true
 
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
 
+---
 app:
   jwt:
     secret: 9a2f8c4e1b7d3f6a8e0c2b5d7e9f1a3b5c7d9e1f3a5b7c9d1e3f5a7b9c1d3e5f
