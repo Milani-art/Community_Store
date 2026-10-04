@@ -14,4 +14,6 @@ public interface BulletinRepository extends JpaRepository<BulletinPost, Long> {
     List<BulletinPost> findByPostTypeOrderByCreatedAtDesc(String postType);
 
     List<BulletinPost> findByAuthorId(Long authorId);
+
+    List<BulletinPost> findByAuthorIdOrderByCreatedAtDesc(Long authorId);
 }

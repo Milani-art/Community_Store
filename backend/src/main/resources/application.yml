@@ -7,32 +7,25 @@ spring:
   application:
     name: community-store-backend
 
+  # MySQL. Every value can be overridden with an environment variable,
+  # so nobody has to commit their own password: ${ENV_NAME:default}
   datasource:
-    url: jdbc:h2:mem:communitystoredb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driverClassName: org.h2.Driver
-    username: sa
-    password: 
-
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-      settings:
-        web-allow-others: true
+    url: ${DB_URL:jdbc:mysql://localhost:3306/communitystore?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Africa/Johannesburg}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
 
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
+      ddl-auto: update   # creates/updates tables from the entities on startup
+    show-sql: false
 
 app:
   jwt:
-    secret: 9a2f8c4e1b7d3f6a8e0c2b5d7e9f1a3b5c7d9e1f3a5b7c9d1e3f5a7b9c1d3e5f
+    # Development default only. Set JWT_SECRET (32+ characters) anywhere that is not your laptop.
+    secret: ${JWT_SECRET:dev-only-secret-change-me-before-deploying-0123456789}
     expiration-ms: 86400000 # 24 hours
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:*,http://127.0.0.1:*}
 
 springdoc:
   api-docs:
