@@ -1,151 +1,88 @@
-import React, { useEffect, useState } from 'react';
-import { Megaphone, Plus, Calendar, Tag } from 'lucide-react';
-import BulletinCard from '../components/BulletinCard';
-import { bulletinApi } from '../services/api';
-import { useAuth } from '../context/AuthContext';
+import React from 'react';
+import { Calendar, User, Tag, ShieldCheck, Megaphone } from 'lucide-react';
 
-const BulletinBoard = () => {
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [formData, setFormData] = useState({
-    title: '',
-    content: '',
-    postType: 'ANNOUNCEMENT',
-    tags: '',
-  });
-  const { user } = useAuth();
+const getPostTypeColor = (type) => {
+  switch (type) {
+    case 'EVENT': return '#10b981';
+    case 'ANNOUNCEMENT': return '#3b82f6';
+    case 'SERVICE_OFFER': return '#8b5cf6';
+    case 'FUNDRAISER': return '#f59e0b';
+    default: return '#64748b';
+  }
+};
 
-  useEffect(() => {
-    fetchPosts();
-  }, []);
+// Returns null for missing or unparseable dates so the UI never shows "Invalid Date".
+const formatDate = (value, withTime = false) => {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return withTime ? date.toLocaleString() : date.toLocaleDateString();
+};
 
-  const fetchPosts = async () => {
-    setLoading(true);
-    try {
-      const res = await bulletinApi.getAll();
-      if (res.data.success) setPosts(res.data.data);
-    } catch (err) {
-      console.error('Failed to load bulletin posts:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCreatePost = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await bulletinApi.create(formData);
-      if (res.data.success) {
-        setShowCreateModal(false);
-        setFormData({ title: '', content: '', postType: 'ANNOUNCEMENT', tags: '' });
-        fetchPosts();
-      }
-    } catch (err) {
-      alert('Failed to create post: ' + (err.response?.data?.message || err.message));
-    }
-  };
+const BulletinCard = ({ post }) => {
+  const color = getPostTypeColor(post.postType);
+  const postedOn = formatDate(post.createdAt);
+  const eventOn = formatDate(post.eventDate, true);
+  const tags = post.tags
+      ? post.tags.split(',').map((t) => t.trim()).filter(Boolean).slice(0, 3)
+      : [];
 
   return (
-    <div style={{ paddingTop: '2rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
-        <div>
-          <h1 style={{ fontSize: '2.25rem', fontWeight: 800, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-            <Megaphone color="#3b82f6" /> Community Bulletin Board
-          </h1>
-          <p style={{ color: '#94a3b8' }}>Campus announcements, club fundraisers, skill-share services, and events.</p>
+      <div className="glass-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
+        <span
+            style={{
+              background: `${color}20`,
+              color,
+              border: `1px solid ${color}50`,
+              padding: '0.2rem 0.6rem',
+              borderRadius: 'var(--radius-full)',
+              fontSize: '0.75rem',
+              fontWeight: 700,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.3rem',
+            }}
+        >
+          <Megaphone size={12} /> {post.postType?.replace(/_/g, ' ')}
+        </span>
+          <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+          {postedOn || 'Recent'}
+        </span>
         </div>
 
-        {user && (
-          <button onClick={() => setShowCreateModal(true)} className="btn btn-primary">
-            <Plus size={18} /> Post Announcement
-          </button>
+        <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '0.65rem', color: 'white' }}>
+          {post.title}
+        </h3>
+
+        <p style={{ color: '#cbd5e1', fontSize: '0.925rem', marginBottom: '1.25rem', flex: 1, whiteSpace: 'pre-line' }}>
+          {post.content}
+        </p>
+
+        {eventOn && (
+            <div style={{ background: 'var(--color-bg)', padding: '0.65rem 0.85rem', borderRadius: 'var(--radius-md)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#60a5fa', fontSize: '0.85rem' }}>
+              <Calendar size={16} />
+              <span>Event Date: <strong>{eventOn}</strong></span>
+            </div>
         )}
-      </div>
 
-      {loading ? (
-        <p style={{ color: '#94a3b8' }}>Loading bulletin posts...</p>
-      ) : posts.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '4rem 1rem', color: '#94a3b8' }}>
-          <p>No bulletin announcements found.</p>
-        </div>
-      ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
-          {posts.map((post) => (
-            <BulletinCard key={post.id} post={post} />
-          ))}
-        </div>
-      )}
-
-      {/* Create Announcement Modal */}
-      {showCreateModal && (
-        <div className="modal-overlay">
-          <div className="modal-card">
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '1rem' }}>New Bulletin Post</h2>
-            <form onSubmit={handleCreatePost}>
-              <div className="form-group">
-                <label>Post Title</label>
-                <input
-                  type="text"
-                  required
-                  className="input-field"
-                  placeholder="e.g. Textbook Swap Meet this Friday"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Type</label>
-                <select
-                  className="input-field"
-                  value={formData.postType}
-                  onChange={(e) => setFormData({ ...formData, postType: e.target.value })}
-                >
-                  <option value="ANNOUNCEMENT">General Announcement</option>
-                  <option value="EVENT">Campus Event</option>
-                  <option value="SERVICE_OFFER">Service Offer / Tutoring</option>
-                  <option value="FUNDRAISER">Club Fundraiser</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>Content Details</label>
-                <textarea
-                  required
-                  rows={4}
-                  className="input-field"
-                  placeholder="Describe your event or announcement..."
-                  value={formData.content}
-                  onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Tags (comma separated)</label>
-                <input
-                  type="text"
-                  className="input-field"
-                  placeholder="e.g. Events,Textbooks,Tutoring"
-                  value={formData.tags}
-                  onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                />
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.5rem' }}>
-                <button type="button" onClick={() => setShowCreateModal(false)} className="btn btn-secondary">
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary">
-                  Publish Post
-                </button>
-              </div>
-            </form>
+        <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', fontSize: '0.8rem', color: '#94a3b8' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <User size={14} />
+            <span>Posted by: <strong style={{ color: '#f8fafc' }}>{post.author?.fullName || 'Unknown'}</strong></span>
+            {post.author?.verified && <ShieldCheck size={14} color="#10b981" aria-label="Verified user" />}
           </div>
+          {tags.length > 0 && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#64748b', flexWrap: 'wrap' }}>
+                <Tag size={12} />
+                {tags.map((tag) => (
+                    <span key={tag}>#{tag}</span>
+                ))}
+              </div>
+          )}
         </div>
-      )}
-    </div>
+      </div>
   );
 };
 
-export default BulletinBoard;
+export default BulletinCard;

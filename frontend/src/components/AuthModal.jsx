@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { X, Lock, Mail, User as UserIcon, Shield, Building } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
+import { getErrorMessage } from '../services/api';
 
 const AuthModal = ({ onClose }) => {
   const [isRegister, setIsRegister] = useState(false);
@@ -14,6 +16,13 @@ const AuthModal = ({ onClose }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login, register } = useAuth();
+  const toast = useToast();
+
+  // Switching between Sign In and Register should not carry the old error message over.
+  const switchMode = (registerMode) => {
+    setError('');
+    setIsRegister(registerMode);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,7 +33,9 @@ const AuthModal = ({ onClose }) => {
       if (isRegister) {
         const res = await register(formData);
         if (res.success) {
-          alert('Registration successful! Please sign in.');
+          toast.success('Registration successful! Please sign in.');
+          // Keep the email so the user only has to type the password again.
+          setFormData({ ...formData, password: '' });
           setIsRegister(false);
         } else {
           setError(res.message || 'Registration failed');
@@ -38,114 +49,148 @@ const AuthModal = ({ onClose }) => {
         }
       }
     } catch (err) {
-      setError('An error occurred during authentication.');
+      setError(
+          getErrorMessage(
+              err,
+              isRegister ? 'Registration failed. Please try again.' : 'Invalid email or password.'
+          )
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-card" style={{ position: 'relative' }}>
-        <button onClick={onClose} style={{ position: 'absolute', top: '1.25rem', right: '1.25rem', color: '#94a3b8' }}>
-          <X size={20} />
-        </button>
+      <div className="modal-overlay">
+        <div className="modal-card" style={{ position: 'relative' }}>
+          <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close"
+              style={{ position: 'absolute', top: '1.25rem', right: '1.25rem', color: '#94a3b8' }}
+          >
+            <X size={20} />
+          </button>
 
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '0.5rem' }}>
-          {isRegister ? 'Create Account' : 'Welcome Back'}
-        </h2>
-        <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
-          {isRegister ? 'Join the campus & community marketplace' : 'Sign in to access your listings and cart'}
-        </p>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '0.5rem' }}>
+            {isRegister ? 'Create Account' : 'Welcome Back'}
+          </h2>
+          <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+            {isRegister ? 'Join the campus & community marketplace' : 'Sign in to access your listings and cart'}
+          </p>
 
-        {error && (
-          <div style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid #ef4444', color: '#fca5a5', padding: '0.65rem 0.85rem', borderRadius: 'var(--radius-md)', fontSize: '0.85rem', marginBottom: '1rem' }}>
-            {error}
-          </div>
-        )}
+          {error && (
+              <div
+                  role="alert"
+                  style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid #ef4444', color: '#fca5a5', padding: '0.65rem 0.85rem', borderRadius: 'var(--radius-md)', fontSize: '0.85rem', marginBottom: '1rem' }}
+              >
+                {error}
+              </div>
+          )}
 
-        <form onSubmit={handleSubmit}>
-          {isRegister && (
+          <form onSubmit={handleSubmit}>
+            {isRegister && (
+                <div className="form-group">
+                  <label htmlFor="auth-fullname">Full Name</label>
+                  <input
+                      id="auth-fullname"
+                      type="text"
+                      required
+                      className="input-field"
+                      placeholder="e.g. Sarah Jenkins"
+                      value={formData.fullName}
+                      onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                  />
+                </div>
+            )}
+
             <div className="form-group">
-              <label>Full Name</label>
+              <label htmlFor="auth-email">Email Address</label>
               <input
-                type="text"
-                required
-                className="input-field"
-                placeholder="e.g. Sarah Jenkins"
-                value={formData.fullName}
-                onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                  id="auth-email"
+                  type="email"
+                  required
+                  className="input-field"
+                  placeholder={isRegister ? 'student@campus.ac.za' : 'your.email@campus.ac.za'}
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               />
             </div>
-          )}
 
-          <div className="form-group">
-            <label>Email Address</label>
-            <input
-              type="email"
-              required
-              className="input-field"
-              placeholder={isRegister ? "student@campus.ac.za" : "your.email@campus.ac.za"}
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Password</label>
-            <input
-              type="password"
-              required
-              className="input-field"
-              placeholder="••••••••"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            />
-          </div>
-
-          {isRegister && (
-            <>
-              <div className="form-group">
-                <label>Account Role</label>
-                <select
+            <div className="form-group">
+              <label htmlFor="auth-password">Password</label>
+              <input
+                  id="auth-password"
+                  type="password"
+                  required
+                  minLength={isRegister ? 6 : undefined}
                   className="input-field"
-                  value={formData.role}
-                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                >
-                  <option value="STUDENT">Student (Uni Email Auto-Verify)</option>
-                  <option value="FACULTY">Faculty / Staff</option>
-                  <option value="VENDOR">Local Vendor / Business</option>
-                  <option value="RESIDENT">Community Resident</option>
-                </select>
-              </div>
+                  placeholder="••••••••"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              />
+              {isRegister && (
+                  <p style={{ color: '#94a3b8', fontSize: '0.75rem', marginTop: '0.35rem' }}>
+                    At least 6 characters.
+                  </p>
+              )}
+            </div>
 
-              <div className="form-group">
-                <label>Department / Business Reg</label>
-                <input
-                  type="text"
-                  className="input-field"
-                  placeholder="e.g. Faculty of IT / Reg No"
-                  value={formData.institutionOrBusiness}
-                  onChange={(e) => setFormData({ ...formData, institutionOrBusiness: e.target.value })}
-                />
-              </div>
-            </>
-          )}
+            {isRegister && (
+                <>
+                  <div className="form-group">
+                    <label htmlFor="auth-role">Account Role</label>
+                    <select
+                        id="auth-role"
+                        className="input-field"
+                        value={formData.role}
+                        onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                    >
+                      <option value="STUDENT">Student (Uni Email Auto-Verify)</option>
+                      <option value="FACULTY">Faculty / Staff</option>
+                      <option value="VENDOR">Local Vendor / Business</option>
+                      <option value="RESIDENT">Community Resident</option>
+                    </select>
+                  </div>
 
-          <button type="submit" disabled={loading} className="btn btn-primary" style={{ width: '100%', padding: '0.85rem', marginTop: '0.5rem' }}>
-            {loading ? 'Please wait...' : isRegister ? 'Register Account' : 'Sign In'}
-          </button>
-        </form>
+                  <div className="form-group">
+                    <label htmlFor="auth-institution">Department / Business Reg</label>
+                    <input
+                        id="auth-institution"
+                        type="text"
+                        className="input-field"
+                        placeholder="e.g. Faculty of IT / Reg No"
+                        value={formData.institutionOrBusiness}
+                        onChange={(e) => setFormData({ ...formData, institutionOrBusiness: e.target.value })}
+                    />
+                  </div>
+                </>
+            )}
 
-        <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.875rem', color: '#94a3b8' }}>
-          {isRegister ? (
-            <span>Already have an account? <button onClick={() => setIsRegister(false)} style={{ color: '#60a5fa', fontWeight: 600 }}>Sign In</button></span>
-          ) : (
-            <span>Need an account? <button onClick={() => setIsRegister(true)} style={{ color: '#60a5fa', fontWeight: 600 }}>Register</button></span>
-          )}
+            <button type="submit" disabled={loading} className="btn btn-primary" style={{ width: '100%', padding: '0.85rem', marginTop: '0.5rem' }}>
+              {loading ? 'Please wait...' : isRegister ? 'Register Account' : 'Sign In'}
+            </button>
+          </form>
+
+          <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.875rem', color: '#94a3b8' }}>
+            {isRegister ? (
+                <span>
+              Already have an account?{' '}
+                  <button type="button" onClick={() => switchMode(false)} style={{ color: '#60a5fa', fontWeight: 600 }}>
+                Sign In
+              </button>
+            </span>
+            ) : (
+                <span>
+              Need an account?{' '}
+                  <button type="button" onClick={() => switchMode(true)} style={{ color: '#60a5fa', fontWeight: 600 }}>
+                Register
+              </button>
+            </span>
+            )}
+          </div>
         </div>
       </div>
-    </div>
   );
 };
 

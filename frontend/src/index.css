@@ -1,14 +1,14 @@
 :root {
   --font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  
+
   /* Color Palette - Vibrant Modern Campus */
   --color-primary: #3b82f6;
   --color-primary-hover: #2563eb;
   --color-primary-light: #eff6ff;
-  
+
   --color-accent: #10b981; /* Eco Green */
   --color-accent-light: #ecfdf5;
-  
+
   --color-warning: #f59e0b;
   --color-danger: #ef4444;
 
@@ -29,7 +29,7 @@
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
   --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
   --shadow-glow: 0 0 25px rgba(59, 130, 246, 0.25);
-  
+
   --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -257,3 +257,49 @@ input, select, textarea {
   border-color: var(--color-primary);
   outline: none;
 }
+
+/* Toast notifications (replaces window.alert) */
+.toast-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: min(380px, calc(100vw - 2rem));
+}
+
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.8rem 1rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-left-width: 4px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  font-size: 0.9rem;
+}
+
+.toast svg { flex-shrink: 0; margin-top: 2px; }
+.toast-success { border-left-color: var(--color-accent); }
+.toast-success svg { color: var(--color-accent); }
+.toast-error { border-left-color: var(--color-danger); }
+.toast-error svg { color: var(--color-danger); }
+.toast-info { border-left-color: var(--color-primary); }
+.toast-info svg { color: var(--color-primary); }
+
+.toast-close {
+  color: var(--color-text-muted);
+  display: inline-flex;
+  padding: 2px;
+}
+.toast-close:hover { color: var(--color-text-main); }
+
+/* Shared helpers used by pages */
+.text-muted { color: var(--color-text-muted); }
+.state-message { padding: 3rem 1rem; text-align: center; color: var(--color-text-muted); }
+.state-error { color: var(--color-danger); }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
