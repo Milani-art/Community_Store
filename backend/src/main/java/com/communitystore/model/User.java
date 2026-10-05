@@ -33,7 +33,15 @@ public class User {
 
     private String institutionOrBusiness;
 
+    /** Kept in step with verificationStatus: true only when the status is APPROVED. */
     private boolean verified;
+
+    @Enumerated(EnumType.STRING)
+    private VerificationStatus verificationStatus;
+
+    /** Reason an admin gave when rejecting the verification, shown to the user. */
+    @Column(length = 500)
+    private String verificationNote;
 
     private double rating;
 
@@ -46,8 +54,13 @@ public class User {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+        // Students with a university email are verified automatically.
         if (role == Role.STUDENT && email != null && (email.endsWith(".ac.za") || email.endsWith(".edu"))) {
             this.verified = true;
         }
+        if (verificationStatus == null) {
+            verificationStatus = verified ? VerificationStatus.APPROVED : VerificationStatus.PENDING;
+        }
+        this.verified = (verificationStatus == VerificationStatus.APPROVED);
     }
 }

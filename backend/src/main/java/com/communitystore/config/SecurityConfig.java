@@ -1,6 +1,7 @@
 package com.communitystore.config;
 
 import com.communitystore.security.JwtAuthFilter;
+import com.communitystore.security.RestSecurityErrorHandler;
 import com.communitystore.security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -8,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -26,6 +28,7 @@ public class SecurityConfig {
 
     private final UserDetailsServiceImpl userDetailsService;
     private final JwtAuthFilter jwtAuthFilter;
+    private final RestSecurityErrorHandler securityErrorHandler;
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
@@ -48,22 +51,29 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+            // Stateless JWT API: no cookies or sessions, so CSRF protection is not needed.
             .csrf(csrf -> csrf.disable())
+            // Uses the "corsFilter" bean from CorsConfig, so browser preflight requests pass.
+            .cors(Customizer.withDefaults())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> 
-                auth.requestMatchers("/auth/**").permitAll()
-                    .requestMatchers("/h2-console/**").permitAll()
-                    .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
+            // 401 / 403 raised by the filter chain come back as ApiResponse JSON.
+            .exceptionHandling(ex -> ex
+                    .authenticationEntryPoint(securityErrorHandler)
+                    .accessDeniedHandler(securityErrorHandler))
+            // Rules are checked top to bottom; the first match wins.
+            .authorizeHttpRequests(auth ->
+                auth.requestMatchers("/auth/**", "/error").permitAll()
+                    .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/api-docs/**", "/v3/api-docs/**").permitAll()
+                    // Must sit ABOVE the public GET rule below, otherwise it would be public too.
+                    .requestMatchers(HttpMethod.GET, "/bulletin/mine").authenticated()
                     .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/bulletin/**").permitAll()
                     .anyRequest().authenticated()
             );
 
-        // Required for H2 Console frame display
-        http.headers(headers -> headers.frameOptions(frame -> frame.disable()));
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
-        return http.build;
+        return http.build();
     }
 }
