@@ -1,6 +1,8 @@
 package com.communitystore.dto;
 
 import com.communitystore.model.Role;
+import com.communitystore.model.User;
+import com.communitystore.model.VerificationStatus;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -70,7 +72,23 @@ public class AuthDtos {
         private Role role;
         private String institutionOrBusiness;
         private boolean verified;
+        private VerificationStatus verificationStatus;
         private double rating;
         private int totalRatings;
+
+        /** Entity -> DTO. Keeps the password and other private fields out of responses. */
+        public static UserSummaryDto from(User user) {
+            return UserSummaryDto.builder()
+                    .id(user.getId())
+                    .email(user.getEmail())
+                    .fullName(user.getFullName())
+                    .role(user.getRole())
+                    .institutionOrBusiness(user.getInstitutionOrBusiness())
+                    .verified(user.isVerified())
+                    .verificationStatus(user.getVerificationStatus())
+                    .rating(user.getRating())
+                    .totalRatings(user.getTotalRatings())
+                    .build();
+        }
     }
 }

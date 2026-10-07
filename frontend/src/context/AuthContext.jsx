@@ -22,7 +22,13 @@ export const AuthProvider = ({ children }) => {
   }, [token]);
 
   const login = async (email, password) => {
-    const res = await authApi.login({ email, password });
+    let res;
+    try {
+      res = await authApi.login({ email, password });
+    } catch (err) {
+      // The API now answers 401 for bad credentials; pass its message to the form.
+      return { success: false, message: err.response?.data?.message || 'Unable to sign in' };
+    }
     if (res.data.success) {
       const data = res.data.data;
       setToken(data.token);
@@ -35,7 +41,13 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (userData) => {
-    const res = await authApi.register(userData);
+    let res;
+    try {
+      res = await authApi.register(userData);
+    } catch (err) {
+      // The API now answers 400/409 (e.g. email already registered); pass its message to the form.
+      return { success: false, message: err.response?.data?.message || 'Registration failed' };
+    }
     if (res.data.success) {
       return { success: true };
     }

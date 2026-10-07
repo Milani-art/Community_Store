@@ -1,151 +1,69 @@
-import React, { useEffect, useState } from 'react';
-import { Megaphone, Plus, Calendar, Tag } from 'lucide-react';
-import BulletinCard from '../components/BulletinCard';
-import { bulletinApi } from '../services/api';
-import { useAuth } from '../context/AuthContext';
+import React from 'react';
+import { Calendar, User, Tag, ShieldCheck, Megaphone } from 'lucide-react';
 
-const BulletinBoard = () => {
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [formData, setFormData] = useState({
-    title: '',
-    content: '',
-    postType: 'ANNOUNCEMENT',
-    tags: '',
-  });
-  const { user } = useAuth();
+const getPostTypeClass = (type) => {
+  switch (type) {
+    case 'EVENT': return 'bulletin-event';
+    case 'ANNOUNCEMENT': return 'bulletin-announcement';
+    case 'SERVICE_OFFER': return 'bulletin-service';
+    case 'FUNDRAISER': return 'bulletin-fundraiser';
+    default: return 'bulletin-default';
+  }
+};
 
-  useEffect(() => {
-    fetchPosts();
-  }, []);
+// Returns null for missing or unparseable dates so the UI never shows "Invalid Date".
+const formatDate = (value, withTime = false) => {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return withTime ? date.toLocaleString() : date.toLocaleDateString();
+};
 
-  const fetchPosts = async () => {
-    setLoading(true);
-    try {
-      const res = await bulletinApi.getAll();
-      if (res.data.success) setPosts(res.data.data);
-    } catch (err) {
-      console.error('Failed to load bulletin posts:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCreatePost = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await bulletinApi.create(formData);
-      if (res.data.success) {
-        setShowCreateModal(false);
-        setFormData({ title: '', content: '', postType: 'ANNOUNCEMENT', tags: '' });
-        fetchPosts();
-      }
-    } catch (err) {
-      alert('Failed to create post: ' + (err.response?.data?.message || err.message));
-    }
-  };
+const BulletinCard = ({ post }) => {
+  const typeClass = getPostTypeClass(post.postType);
+  const postedOn = formatDate(post.createdAt);
+  const eventOn = formatDate(post.eventDate, true);
+  const tags = post.tags
+      ? post.tags.split(',').map((t) => t.trim()).filter(Boolean).slice(0, 3)
+      : [];
 
   return (
-    <div style={{ paddingTop: '2rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
-        <div>
-          <h1 style={{ fontSize: '2.25rem', fontWeight: 800, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-            <Megaphone color="#3b82f6" /> Community Bulletin Board
-          </h1>
-          <p style={{ color: '#94a3b8' }}>Campus announcements, club fundraisers, skill-share services, and events.</p>
+      <div className="glass-card bulletin-card">
+        <div className="bulletin-card-meta">
+        <span className={`bulletin-type ${typeClass}`}>
+          <Megaphone size={12} /> {post.postType?.replace(/_/g, ' ')}
+        </span>
+          <span className="bulletin-date">{postedOn || 'Recent'}</span>
         </div>
 
-        {user && (
-          <button onClick={() => setShowCreateModal(true)} className="btn btn-primary">
-            <Plus size={18} /> Post Announcement
-          </button>
+        <h3 className="bulletin-title">{post.title}</h3>
+
+        <p className="bulletin-content">{post.content}</p>
+
+        {eventOn && (
+            <div className="bulletin-event-date">
+              <Calendar size={16} />
+              <span>Event Date: <strong>{eventOn}</strong></span>
+            </div>
         )}
-      </div>
 
-      {loading ? (
-        <p style={{ color: '#94a3b8' }}>Loading bulletin posts...</p>
-      ) : posts.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '4rem 1rem', color: '#94a3b8' }}>
-          <p>No bulletin announcements found.</p>
-        </div>
-      ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
-          {posts.map((post) => (
-            <BulletinCard key={post.id} post={post} />
-          ))}
-        </div>
-      )}
-
-      {/* Create Announcement Modal */}
-      {showCreateModal && (
-        <div className="modal-overlay">
-          <div className="modal-card">
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '1rem' }}>New Bulletin Post</h2>
-            <form onSubmit={handleCreatePost}>
-              <div className="form-group">
-                <label>Post Title</label>
-                <input
-                  type="text"
-                  required
-                  className="input-field"
-                  placeholder="e.g. Textbook Swap Meet this Friday"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Type</label>
-                <select
-                  className="input-field"
-                  value={formData.postType}
-                  onChange={(e) => setFormData({ ...formData, postType: e.target.value })}
-                >
-                  <option value="ANNOUNCEMENT">General Announcement</option>
-                  <option value="EVENT">Campus Event</option>
-                  <option value="SERVICE_OFFER">Service Offer / Tutoring</option>
-                  <option value="FUNDRAISER">Club Fundraiser</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>Content Details</label>
-                <textarea
-                  required
-                  rows={4}
-                  className="input-field"
-                  placeholder="Describe your event or announcement..."
-                  value={formData.content}
-                  onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Tags (comma separated)</label>
-                <input
-                  type="text"
-                  className="input-field"
-                  placeholder="e.g. Events,Textbooks,Tutoring"
-                  value={formData.tags}
-                  onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                />
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.5rem' }}>
-                <button type="button" onClick={() => setShowCreateModal(false)} className="btn btn-secondary">
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary">
-                  Publish Post
-                </button>
-              </div>
-            </form>
+        <div className="bulletin-card-footer">
+          <div className="bulletin-author">
+            <User size={14} />
+            <span>Posted by: <strong>{post.author?.fullName || 'Unknown'}</strong></span>
+            {post.author?.verified && <ShieldCheck size={14} color="var(--color-accent)" aria-label="Verified user" />}
           </div>
+          {tags.length > 0 && (
+              <div className="bulletin-tag">
+                <Tag size={12} />
+                {tags.map((tag) => (
+                    <span key={tag}>#{tag}</span>
+                ))}
+              </div>
+          )}
         </div>
-      )}
-    </div>
+      </div>
   );
 };
 
-export default BulletinBoard;
+export default BulletinCard;
