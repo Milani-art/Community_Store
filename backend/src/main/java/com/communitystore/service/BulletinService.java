@@ -53,8 +53,7 @@ public class BulletinService {
     @Transactional
     public ApiResponse<BulletinDto.Response> createPost(BulletinDto.CreateRequest request, String userEmail) {
         User author = userService.getByEmail(userEmail);
-        userService.requireVerified(author); // unverified accounts may read but not post
-
+        
         BulletinPost post = BulletinPost.builder().author(author).build();
         applyRequest(post, request);
 
