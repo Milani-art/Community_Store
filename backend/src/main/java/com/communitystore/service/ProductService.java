@@ -70,6 +70,20 @@ public class ProductService {
         return ApiResponse.success("Product created successfully", mapToResponse(savedProduct));
     }
 
+    public ApiResponse<Void> deleteProduct(Long id, String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+
+        if (user.getRole() != com.communitystore.model.Role.ADMIN && !product.getSeller().getId().equals(user.getId())) {
+            throw new com.communitystore.exception.ForbiddenException("Only the seller or an admin can delete this product.");
+        }
+
+        productRepository.delete(product);
+        return ApiResponse.success("Product deleted successfully", null);
+    }
+
     public ProductDto.Response mapToResponse(Product product) {
         AuthDtos.UserSummaryDto sellerDto = authService.mapToSummary(product.getSeller());
         return ProductDto.Response.builder()

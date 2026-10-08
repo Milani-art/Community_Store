@@ -49,6 +49,8 @@ public class User {
 
     private String profileImage;
 
+    private boolean banned;
+
     private LocalDateTime createdAt;
 
     @PrePersist

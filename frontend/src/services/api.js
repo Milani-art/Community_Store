@@ -76,11 +76,13 @@ export const productApi = {
     getByCategory: (category) => api.get(`/products/category/${category}`),
     search: (query) => api.get(`/products/search?q=${encodeURIComponent(query)}`),
     create: (productData) => api.post('/products', productData),
+    delete: (id) => api.delete(`/products/${id}`),
 };
 
 export const bulletinApi = {
     getAll: () => api.get('/bulletin'),
     create: (postData) => api.post('/bulletin', postData),
+    delete: (id) => api.delete(`/bulletin/${id}`),
 };
 
 export const orderApi = {

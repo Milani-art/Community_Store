@@ -47,4 +47,10 @@ public class ProductController {
             Authentication authentication) {
         return ResponseEntity.ok(productService.createProduct(request, authentication.getName()));
     }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable Long id, Authentication authentication) {
+        return ResponseEntity.ok(productService.deleteProduct(id, authentication.getName()));
+    }
 }

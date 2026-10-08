@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ShoppingBag, ShieldCheck, Leaf, Star, MapPin, ArrowLeft, User } from 'lucide-react';
+import { ShoppingBag, ShieldCheck, Leaf, Star, MapPin, ArrowLeft, User, Trash2 } from 'lucide-react';
 import { productApi, getErrorMessage } from '../services/api';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -11,6 +13,9 @@ const ProductDetail = () => {
   const [error, setError] = useState('');
   const [imageFailed, setImageFailed] = useState(false);
   const { addToCart } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const isAdmin = user && user.role === 'ADMIN';
 
   useEffect(() => {
     let cancelled = false;
@@ -25,7 +30,6 @@ const ProductDetail = () => {
       } catch (err) {
         if (!cancelled) {
           setProduct(null);
-          // A 404 means "no such product"; anything else is a real failure worth surfacing.
           if (err.response?.status !== 404) setError(getErrorMessage(err, 'Failed to load product details.'));
         }
       } finally {
@@ -38,6 +42,20 @@ const ProductDetail = () => {
       cancelled = true;
     };
   }, [id]);
+
+  const handleDelete = async () => {
+    if (window.confirm('Are you sure you want to delete this listing?')) {
+      try {
+        const res = await productApi.delete(id);
+        if (res.data.success) {
+          alert('Product deleted successfully');
+          navigate('/marketplace');
+        }
+      } catch (err) {
+        alert(getErrorMessage(err, 'Failed to delete product.'));
+      }
+    }
+  };
 
   if (loading) return <div className="state-message">Loading product details...</div>;
 
@@ -54,7 +72,7 @@ const ProductDetail = () => {
 
   const seller = product.seller;
   const showImage = product.imageUrl && !imageFailed;
-  const canBuy = product.available !== false;
+  const canBuy = product.available !== false && !isAdmin;
 
   return (
       <div style={{ paddingTop: '2rem' }}>
@@ -87,7 +105,8 @@ const ProductDetail = () => {
               {product.ecoFriendly && (
                   <span className="badge badge-eco"><Leaf size={12} /> Eco-Friendly</span>
               )}
-              {!canBuy && <span className="badge badge-vendor">Unavailable</span>}
+              {!canBuy && !isAdmin && <span className="badge badge-vendor">Unavailable</span>}
+              {isAdmin && <span className="badge badge-warning">Admin Mode</span>}
             </div>
 
             <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.75rem' }}>{product.title}</h1>
@@ -135,15 +154,26 @@ const ProductDetail = () => {
             )}
 
             <div style={{ display: 'flex', gap: '1rem' }}>
-              <button
-                  type="button"
-                  onClick={() => addToCart(product)}
-                  disabled={!canBuy}
-                  className="btn btn-primary"
-                  style={{ flex: 1, padding: '0.85rem', fontSize: '1rem' }}
-              >
-                <ShoppingBag size={20} /> {canBuy ? 'Add to Cart' : 'Currently Unavailable'}
-              </button>
+              {!isAdmin ? (
+                  <button
+                      type="button"
+                      onClick={() => addToCart(product)}
+                      disabled={!canBuy}
+                      className="btn btn-primary"
+                      style={{ flex: 1, padding: '0.85rem', fontSize: '1rem' }}
+                  >
+                    <ShoppingBag size={20} /> {canBuy ? 'Add to Cart' : 'Currently Unavailable'}
+                  </button>
+              ) : (
+                  <button
+                      type="button"
+                      onClick={handleDelete}
+                      className="btn btn-primary"
+                      style={{ flex: 1, padding: '0.85rem', fontSize: '1rem', background: 'var(--color-danger)' }}
+                  >
+                    <Trash2 size={20} /> Delete Listing
+                  </button>
+              )}
             </div>
           </div>
         </div>

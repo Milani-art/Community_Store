@@ -442,4 +442,7 @@ return (
             )}
         </div>
     </div>
-)};
+  );
+};
+
+export default AdminPanel;

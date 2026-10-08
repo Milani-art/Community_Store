@@ -46,6 +46,10 @@ public class OrderService {
                 User buyer = userRepository.findByEmail(userEmail)
                                 .orElseThrow(() -> new RuntimeException("Buyer user not found"));
 
+                if (buyer.getRole() == com.communitystore.model.Role.ADMIN) {
+                        throw new com.communitystore.exception.ForbiddenException("Admins cannot purchase products.");
+                }
+
                 Order order = Order.builder()
                                 .buyer(buyer)
                                 .status(status)
