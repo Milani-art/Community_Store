@@ -11,7 +11,7 @@ const Footer = () => {
             <span>CommunityStore</span>
           </div>
           <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
-            Connecting campus students, faculty, local vendors, and residents in a trusted, sustainable marketplace ecosystem.
+            Connecting CPUT students, faculty, local vendors, and residents in a trusted, sustainable marketplace ecosystem.
           </p>
         </div>
 
@@ -47,7 +47,7 @@ const Footer = () => {
       </div>
 
       <div className="container footer-legal">
-        © 2026 CommunityStore. Designed for Campus Sustainability.
+        © 2026 CommunityStore. Designed for CPUT Sustainability.
       </div>
     </footer>
   );

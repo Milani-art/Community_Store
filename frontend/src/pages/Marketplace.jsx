@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Search, Leaf, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Search, Leaf, X, ArrowLeft } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { productApi, getErrorMessage } from '../services/api';
 
@@ -67,8 +68,11 @@ const Marketplace = () => {
 
   return (
       <div style={{ paddingTop: '2rem' }}>
+        <Link to="/" style={{ color: 'var(--color-primary)', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', marginBottom: '1.5rem', fontWeight: 600 }}>
+          <ArrowLeft size={18} /> Back to Home
+        </Link>
         <div style={{ marginBottom: '2rem' }}>
-          <h1 style={{ fontSize: '2.25rem', fontWeight: 800, marginBottom: '0.5rem' }}>Campus Marketplace</h1>
+          <h1 style={{ fontSize: '2.25rem', fontWeight: 800, marginBottom: '0.5rem' }}>CPUT Marketplace</h1>
           <p className="text-muted">Browse textbook exchanges, electronics, services, and local vendor offers.</p>
         </div>
 

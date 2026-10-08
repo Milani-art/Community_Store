@@ -2,6 +2,10 @@ import React from 'react';
 import { Calendar, User, Tag, ShieldCheck, Megaphone } from 'lucide-react';
 
 const BulletinCard = ({ post }) => {
+  const postedDate = post.createdAt ? new Date(post.createdAt) : null;
+  const eventDate = post.eventDate ? new Date(post.eventDate) : null;
+  const hasEventDate = eventDate && !Number.isNaN(eventDate.getTime());
+
   const getPostTypeClass = (type) => {
     switch (type) {
       case 'EVENT': return 'bulletin-event';
@@ -19,7 +23,7 @@ const BulletinCard = ({ post }) => {
           <Megaphone size={12} /> {post.postType}
         </span>
         <span className="bulletin-date">
-          {post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Recent'}
+          {postedDate && !Number.isNaN(postedDate.getTime()) ? postedDate.toLocaleDateString() : 'Recent'}
         </span>
       </div>
 
@@ -27,18 +31,18 @@ const BulletinCard = ({ post }) => {
 
       <p className="bulletin-content">{post.content}</p>
 
-      {post.eventDate && (
+      {hasEventDate && (
         <div className="bulletin-event-date">
           <Calendar size={16} />
-          <span>Event Date: <strong>{new Date(post.eventDate).toLocaleString()}</strong></span>
+          <span>Event Date: <strong>{eventDate.toLocaleString()}</strong></span>
         </div>
       )}
 
       <div className="bulletin-card-footer">
         <div className="bulletin-author">
           <User size={14} />
-          <span>Posted by: <strong>{post.author.fullName}</strong></span>
-          {post.author.verified && <ShieldCheck size={14} color="var(--color-accent)" />}
+          <span>Posted by: <strong>{post.author?.fullName || 'Community member'}</strong></span>
+          {post.author?.verified && <ShieldCheck size={14} color="var(--color-accent)" aria-label="Verified user" />}
         </div>
         {post.tags && (
           <div className="bulletin-tag">

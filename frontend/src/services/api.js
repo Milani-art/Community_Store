@@ -85,6 +85,7 @@ export const bulletinApi = {
 
 export const orderApi = {
     create: (orderData) => api.post('/orders', orderData),
+    createPayFastCheckout: (orderData) => api.post('/orders/payfast/checkout', orderData),
     getMyOrders: () => api.get('/orders/my-orders'),
 };
 

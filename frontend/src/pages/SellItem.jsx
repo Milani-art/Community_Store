@@ -24,7 +24,7 @@ const INITIAL_FORM = {
     conditionName: 'Used - Good',
     ecoFriendly: false,
     imageUrl: '',
-    location: 'Campus Main',
+    location: 'District Six Campus',
 };
 
 const SellItem = () => {
@@ -94,7 +94,7 @@ const SellItem = () => {
                 <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <PlusCircle color="var(--color-primary)" /> Create New Item Listing
                 </h1>
-                <p className="text-muted">Sell products or offer services to campus peers & local community.</p>
+                <p className="text-muted">Sell products or offer services to CPUT peers & local community.</p>
             </div>
 
             <form onSubmit={handleSubmit} className="glass-card" style={{ padding: '2rem' }}>
@@ -150,15 +150,15 @@ const SellItem = () => {
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="sell-location">Pick-up Location</label>
-                        <input
-                            id="sell-location"
-                            type="text"
-                            className="input-field"
-                            placeholder="e.g. Main Library / Student Res B"
-                            value={formData.location}
-                            onChange={update('location')}
-                        />
+                        <label htmlFor="sell-location">Campus / Pick-up Location</label>
+                        <select id="sell-location" className="input-field" value={formData.location} onChange={update('location')}>
+                            <option value="District Six Campus">District Six Campus</option>
+                            <option value="Bellville Campus">Bellville Campus</option>
+                            <option value="Granger Bay Campus">Granger Bay Campus</option>
+                            <option value="Mowbray Campus">Mowbray Campus</option>
+                            <option value="Wellington Campus">Wellington Campus</option>
+                            <option value="Athlone Campus">Athlone Campus</option>
+                        </select>
                     </div>
                 </div>
 

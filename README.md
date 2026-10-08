@@ -106,6 +106,11 @@ instead of editing `application.yml`, so passwords never get committed:
 | `DB_PASSWORD` | `password` | MySQL password |
 | `JWT_SECRET` | development-only value | Token signing key, 32+ characters |
 | `CORS_ALLOWED_ORIGINS` | any port on localhost | Frontend origins allowed to call the API |
+| `PAYFAST_MERCHANT_ID` | unset | Sandbox merchant ID |
+| `PAYFAST_MERCHANT_KEY` | unset | Sandbox merchant key |
+| `PAYFAST_PASSPHRASE` | unset | Sandbox salt passphrase, if configured |
+| `PAYFAST_NOTIFY_URL` | unset | Public HTTPS URL ending in `/api/payments/payfast/itn` |
+| `FRONTEND_BASE_URL` | `http://localhost:3000` | Frontend URL used for PayFast return and cancel URLs |
 
 ```bash
 # macOS / Linux
@@ -114,6 +119,19 @@ DB_PASSWORD=yourpassword mvn spring-boot:run
 # Windows PowerShell
 $env:DB_PASSWORD="yourpassword"; mvn spring-boot:run
 ```
+
+PayFast checkout uses the Sandbox only. Set the merchant values from your PayFast Sandbox dashboard in the backend environment; never put them in frontend code or commit them. PayFast must be able to reach the ITN endpoint, so for local testing expose backend port `8080` through an HTTPS tunnel and set `PAYFAST_NOTIFY_URL` to `https://<your-tunnel>/api/payments/payfast/itn`. If a sandbox passphrase is configured, set the same value in `PAYFAST_PASSPHRASE`.
+
+```powershell
+$env:PAYFAST_MERCHANT_ID = "<sandbox-merchant-id>"
+$env:PAYFAST_MERCHANT_KEY = "<sandbox-merchant-key>"
+$env:PAYFAST_PASSPHRASE = "<sandbox-passphrase>"
+$env:PAYFAST_NOTIFY_URL = "https://<your-tunnel>/api/payments/payfast/itn"
+$env:FRONTEND_BASE_URL = "http://localhost:3000"
+mvn spring-boot:run
+```
+
+The checkout creates a pending order and redirects to PayFast Sandbox. The customer return URL is not treated as proof of payment: the order is marked complete only after the backend validates the ITN signature, merchant, amount, and notification with PayFast.
 
 #### Running the tests
 
@@ -185,5 +203,9 @@ The frontend application will launch at **`http://localhost:3000`**.
 - `DELETE /api/bulletin/{id}` - Delete a post (author or admin)
 
 ### Checkout & Cart Orders (`/api/orders`)
-- `POST /api/orders` - Complete checkout with SnapScan / PayFast / Cash payment method
+- `POST /api/orders` - Create a SnapScan or cash-on-pickup order
+- `POST /api/orders/payfast/checkout` - Create a pending PayFast Sandbox order and signed checkout fields (Requires Authentication)
 - `GET /api/orders/my-orders` - View user purchase history
+
+### PayFast Sandbox Notifications (`/api/payments/payfast`)
+- `POST /api/payments/payfast/itn` - Public PayFast ITN callback; validates the signature, merchant, amount, and PayFast server response before completing the order

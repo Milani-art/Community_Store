@@ -10,6 +10,13 @@ spring:
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:mysql}
 
+  sql:
+    init:
+      mode: always
+
+  jpa:
+    defer-datasource-initialization: true
+
 ---
 # MySQL Profile (Default for production & MySQL Workbench)
 # Run with DB_USERNAME and DB_PASSWORD set to your MySQL Workbench credentials:
@@ -21,8 +28,8 @@ spring:
 
   datasource:
     url: ${DB_URL:jdbc:mysql://localhost:3306/communitystore?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:root}
+    username: admin
+    password: administrator
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -46,7 +53,7 @@ spring:
     url: jdbc:h2:mem:communitystoredb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     driverClassName: org.h2.Driver
     username: sa
-    password: 
+    password:
 
   h2:
     console:

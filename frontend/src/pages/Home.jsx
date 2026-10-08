@@ -33,7 +33,7 @@ const Home = () => {
     <div className="home-page">
       <section className="home-hero">
         <div className="home-hero-copy">
-          <span className="eyebrow">Campus & community marketplace</span>
+          <span className="eyebrow">CPUT & community marketplace</span>
           <h1>Good things, <em>close to home.</em></h1>
           <p>Discover useful finds, local services, and the people who make our community feel like home.</p>
           <div className="home-hero-actions">

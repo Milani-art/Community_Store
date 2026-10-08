@@ -50,7 +50,7 @@ const Dashboard = () => {
               <div>
                 <h3 style={{ fontSize: '1.2rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                   {user.fullName}
-                  {user.verified && <ShieldCheck size={18} color="var(--color-accent)" aria-label="Verified Campus Identity" />}
+                  {user.verified && <ShieldCheck size={18} color="var(--color-accent)" aria-label="Verified CPUT Identity" />}
                 </h3>
                 <p className="text-muted" style={{ fontSize: '0.85rem' }}>{user.email}</p>
               </div>
@@ -101,7 +101,7 @@ const Dashboard = () => {
 
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
               {user.verified && <span className="badge badge-verified">Verified ID</span>}
-              {orders.length > 0 && <span className="badge badge-eco">Campus Trader</span>}
+              {orders.length > 0 && <span className="badge badge-eco">CPUT Trader</span>}
               {!user.verified && orders.length === 0 && (
                   <span className="text-muted" style={{ fontSize: '0.85rem' }}>Badges appear as you verify your ID and trade.</span>
               )}

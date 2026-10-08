@@ -382,6 +382,37 @@ input, select, textarea {
 .product-card-rating .badge { padding: 0.12rem 0.35rem; font-size: 0.58rem; }
 .product-card-add { padding: 0.45rem 0.65rem; font-size: 0.8rem; flex-shrink: 0; }
 .bulletin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: 1rem; }
+.bulletin-page { padding: 2.5rem 0 1rem; }
+.bulletin-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; padding-bottom: 1.75rem; border-bottom: 1px solid var(--color-border); }
+.bulletin-heading h1 { margin-bottom: 0.45rem; font-size: clamp(2.5rem, 5vw, 3.6rem); line-height: 1.08; }
+.bulletin-heading p, .bulletin-feed-header p { color: var(--color-text-muted); font-size: 0.92rem; }
+.bulletin-compose-trigger { flex-shrink: 0; }
+.bulletin-sign-in-note, .bulletin-notice { margin-top: 1rem; color: var(--color-text-muted); font-size: 0.87rem; }
+.bulletin-notice { color: var(--color-primary); }
+.bulletin-composer { margin-top: 1.5rem; padding: 1.4rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); box-shadow: var(--shadow-sm); }
+.bulletin-composer-heading { display: flex; justify-content: space-between; margin-bottom: 1.1rem; }
+.bulletin-composer-heading h2, .bulletin-feed-header h2 { font-family: var(--font-display); font-size: 1.65rem; font-weight: 400; }
+.bulletin-composer-heading p { color: var(--color-text-muted); font-size: 0.85rem; }
+.bulletin-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 1rem; }
+.bulletin-form-wide { grid-column: 1 / -1; }
+.bulletin-composer .form-group label span { color: var(--color-text-muted); font-weight: 400; }
+.bulletin-composer textarea { resize: vertical; }
+.bulletin-composer-actions { display: flex; justify-content: flex-end; gap: 0.6rem; padding-top: 0.3rem; }
+.bulletin-form-error { margin: 0 0 1rem; padding: 0.65rem 0.8rem; border: 1px solid #edd2cf; border-radius: var(--radius-sm); background: #fbefed; color: var(--color-danger); font-size: 0.85rem; }
+.bulletin-feed-header { display: flex; align-items: center; justify-content: space-between; margin: 2.2rem 0 0.9rem; }
+.bulletin-feed-header > svg { color: var(--color-primary); }
+.bulletin-filters { display: flex; gap: 0.3rem; overflow-x: auto; padding-bottom: 0.8rem; border-bottom: 1px solid var(--color-border); scrollbar-width: none; }
+.bulletin-filters::-webkit-scrollbar { display: none; }
+.bulletin-filter { display: inline-flex; align-items: center; gap: 0.5rem; flex: 0 0 auto; padding: 0.55rem 0.7rem; border-bottom: 2px solid transparent; color: var(--color-text-muted); font-size: 0.82rem; font-weight: 500; transition: color var(--transition-fast), border-color var(--transition-fast); }
+.bulletin-filter span { color: inherit; opacity: 0.7; font-size: 0.72rem; }
+.bulletin-filter:hover, .bulletin-filter.active { color: var(--color-primary); }
+.bulletin-filter.active { border-bottom-color: var(--color-primary); }
+.bulletin-feed { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; padding-top: 1rem; }
+.bulletin-state { display: flex; min-height: 220px; flex-direction: column; align-items: center; justify-content: center; gap: 0.55rem; padding: 2rem; color: var(--color-text-muted); text-align: center; }
+.bulletin-state > svg { margin-bottom: 0.25rem; color: var(--color-primary); }
+.bulletin-state h3 { color: var(--color-text-main); font-size: 1rem; font-weight: 600; }
+.bulletin-state p { font-size: 0.86rem; }
+.bulletin-state-error { color: var(--color-danger); }
 .bulletin-card { display: flex; flex-direction: column; padding: 1.25rem; }
 .bulletin-card-meta { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.85rem; }
 .bulletin-type { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.2rem 0.55rem; border: 1px solid transparent; border-radius: var(--radius-full); font-size: 0.68rem; font-weight: 700; }
@@ -422,6 +453,9 @@ input, select, textarea {
   .home-section-heading h2 { font-size: 1.7rem; }
   .home-section-heading p { max-width: 34ch; }
   .home-section-link { align-self: flex-end; font-size: 0.8rem; }
+  .bulletin-heading { align-items: flex-start; }
+  .bulletin-heading h1 { font-size: clamp(2.25rem, 9vw, 3rem); }
+  .bulletin-feed { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 480px) {
@@ -431,6 +465,16 @@ input, select, textarea {
   .home-section-heading { flex-direction: column; gap: 0.6rem; }
   .home-section-link { align-self: flex-start; }
   .product-card-media { height: 190px; }
+  .bulletin-page { padding-top: 1.25rem; }
+  .bulletin-heading { flex-direction: column; gap: 1rem; }
+  .bulletin-compose-trigger { align-self: stretch; }
+  .bulletin-form-grid { grid-template-columns: 1fr; }
+  .bulletin-form-wide { grid-column: auto; }
+  .bulletin-composer { padding: 1rem; }
+  .bulletin-composer-actions { justify-content: stretch; }
+  .bulletin-composer-actions .btn { flex: 1; }
+  .bulletin-feed-header { margin-top: 1.5rem; }
+  .bulletin-filters { margin-right: -0.9rem; padding-right: 0.9rem; }
   .site-footer { padding-top: 2rem; }
   .site-footer > .container:first-child { grid-template-columns: 1fr 1fr; gap: 1.5rem 1rem; }
 }

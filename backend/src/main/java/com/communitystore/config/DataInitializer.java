@@ -30,7 +30,7 @@ public class DataInitializer implements CommandLineRunner {
 
         // Create Seed Users
         User student = User.builder()
-                .email("student@campus.ac.za")
+                .email("student@mycput.ac.za")
                 .password(passwordEncoder.encode("password123"))
                 .fullName("Sarah Jenkins")
                 .role(Role.STUDENT)
@@ -52,7 +52,7 @@ public class DataInitializer implements CommandLineRunner {
                 .build();
 
         User faculty = User.builder()
-                .email("professor@campus.ac.za")
+                .email("professor@cput.ac.za")
                 .password(passwordEncoder.encode("password123"))
                 .fullName("Dr. Michael Vance")
                 .role(Role.FACULTY)
@@ -95,7 +95,7 @@ public class DataInitializer implements CommandLineRunner {
                 .conditionName("Used - Good")
                 .isEcoFriendly(true)
                 .isAvailable(true)
-                .location("Main Campus Library")
+                .location("District Six Campus - Library")
                 .seller(student)
                 .imageUrl("https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80")
                 .build();
@@ -108,7 +108,7 @@ public class DataInitializer implements CommandLineRunner {
                 .conditionName("Used - Excellent")
                 .isEcoFriendly(false)
                 .isAvailable(true)
-                .location("Student Village Block B")
+                .location("Bellville Campus - Student Res B")
                 .seller(student)
                 .imageUrl("https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=600&q=80")
                 .build();
@@ -121,7 +121,7 @@ public class DataInitializer implements CommandLineRunner {
                 .conditionName("New")
                 .isEcoFriendly(true)
                 .isAvailable(true)
-                .location("Local Vendor Hub")
+                .location("District Six Campus - Piazza")
                 .seller(vendor)
                 .imageUrl("https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&w=600&q=80")
                 .build();
@@ -134,7 +134,7 @@ public class DataInitializer implements CommandLineRunner {
                 .conditionName("Service")
                 .isEcoFriendly(true)
                 .isAvailable(true)
-                .location("Online / Campus Cafe")
+                .location("Online / Bellville Campus IT Centre")
                 .seller(faculty)
                 .imageUrl("https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80")
                 .build();
@@ -143,17 +143,17 @@ public class DataInitializer implements CommandLineRunner {
 
         // Create Seed Bulletin Posts
         BulletinPost post1 = BulletinPost.builder()
-                .title("Eco-Drive: Campus E-Waste & Textbook Recycle Fair")
+                .title("Eco-Drive: CPUT E-Waste & Textbook Recycle Fair")
                 .content("Join us this Friday at the Student Center Quad! Trade old textbooks, recycle electronic waste safely, and earn Community Loyalty Badges.")
                 .postType("EVENT")
-                .tags("Sustainability,Recycling,CampusLife")
+                .tags("Sustainability,Recycling,CPUT")
                 .eventDate(LocalDateTime.now().plusDays(3))
                 .author(student)
                 .build();
 
         BulletinPost post2 = BulletinPost.builder()
                 .title("Local Vendor Student Discount Week!")
-                .content("All verified campus email holders get 15% discount on stationery and printing services at Campus Supplies Co. this month!")
+                .content("All verified CPUT email holders get 15% discount on stationery and printing services at Campus Supplies Co. this month!")
                 .postType("ANNOUNCEMENT")
                 .tags("Discounts,Stationery,VendorOffer")
                 .author(vendor)

@@ -120,7 +120,7 @@ const ProductDetail = () => {
                       <div>
                         <div style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                           {seller.fullName}
-                          {seller.verified && <ShieldCheck size={16} color="var(--color-accent)" aria-label="Verified Campus Identity" />}
+                          {seller.verified && <ShieldCheck size={16} color="var(--color-accent)" aria-label="Verified CPUT Identity" />}
                         </div>
                         <div className="text-muted" style={{ fontSize: '0.8rem' }}>
                           {seller.institutionOrBusiness || seller.role}

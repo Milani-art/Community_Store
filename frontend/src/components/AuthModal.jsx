@@ -76,7 +76,7 @@ const AuthModal = ({ onClose }) => {
             {isRegister ? 'Create Account' : 'Welcome Back'}
           </h2>
           <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
-            {isRegister ? 'Join the campus & community marketplace' : 'Sign in to access your listings and cart'}
+            {isRegister ? 'Join the CPUT & community marketplace' : 'Sign in to access your listings and cart'}
           </p>
 
           {error && (
@@ -111,7 +111,7 @@ const AuthModal = ({ onClose }) => {
                   type="email"
                   required
                   className="input-field"
-                  placeholder={isRegister ? 'student@campus.ac.za' : 'your.email@campus.ac.za'}
+                  placeholder={isRegister ? 'student@mycput.ac.za' : 'your.email@cput.ac.za'}
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               />

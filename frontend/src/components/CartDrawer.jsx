@@ -136,7 +136,7 @@ const CartDrawer = () => {
                             Total Paid: <strong>R {Number(successOrder.totalAmount ?? 0).toFixed(2)}</strong> via {successOrder.paymentMethod}
                         </p>
                         <div style={{ background: 'var(--color-bg)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', width: '100%', fontSize: '0.85rem', color: 'var(--color-primary)' }}>
-                            <ShieldCheck size={16} /> Protected by Campus Escrow Protection
+                            <ShieldCheck size={16} /> Protected by CPUT Escrow Protection
                         </div>
                         <button type="button" onClick={closeDrawer} className="btn btn-primary" style={{ width: '100%' }}>
                             Continue Shopping
@@ -175,7 +175,7 @@ const CartDrawer = () => {
                                 <select id="cart-payment" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} className="input-field">
                                     <option value="SNAPSCAN">SnapScan QR</option>
                                     <option value="PAYFAST">PayFast Gateway</option>
-                                    <option value="CASH_ON_PICKUP">Cash / Campus Pick-up</option>
+                                    <option value="CASH_ON_PICKUP">Cash / CPUT Campus Pick-up</option>
                                 </select>
                             </div>
 
