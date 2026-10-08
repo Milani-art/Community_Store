@@ -90,8 +90,17 @@ export const orderApi = {
 };
 
 export const userApi = {
+    getAllUsers: () => api.get('/users'),
+
     getPendingVerifications: () => api.get('/users/pending-verification'),
+
     verifyUser: (userId) => api.put(`/users/${userId}/verify`),
+
+    banUser: (userId) => api.put(`/users/${userId}/ban`),
+
+    unbanUser: (userId) => api.put(`/users/${userId}/unban`),
+
+    deleteUser: (userId) => api.delete(`/users/${userId}`),
 };
 
 export default api;

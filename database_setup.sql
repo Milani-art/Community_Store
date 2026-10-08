@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS `users` (
     `role` VARCHAR(50) NOT NULL,
     `institution_or_business` VARCHAR(255),
     `verified` BOOLEAN DEFAULT FALSE,
+    `banned` BOOLEAN DEFAULT FALSE,
     `verification_status` VARCHAR(50) DEFAULT 'PENDING',
     `verification_note` VARCHAR(500),
     `rating` DOUBLE DEFAULT 5.0,

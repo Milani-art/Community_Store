@@ -27,27 +27,37 @@ public class UserController {
     // ---------- the logged-in user ----------
 
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<UserDtos.ProfileResponse>> getMyProfile(Authentication authentication) {
-        return ResponseEntity.ok(userService.getMyProfile(authentication.getName()));
+    public ResponseEntity<ApiResponse<UserDtos.ProfileResponse>> getMyProfile(
+            Authentication authentication) {
+        return ResponseEntity.ok(
+                userService.getMyProfile(authentication.getName())
+        );
     }
 
     @PutMapping("/me")
     public ResponseEntity<ApiResponse<UserDtos.ProfileResponse>> updateMyProfile(
             @Valid @RequestBody UserDtos.UpdateProfileRequest request,
             Authentication authentication) {
-        return ResponseEntity.ok(userService.updateMyProfile(authentication.getName(), request));
+        return ResponseEntity.ok(
+                userService.updateMyProfile(authentication.getName(), request)
+        );
     }
 
     @PutMapping("/me/password")
     public ResponseEntity<ApiResponse<Void>> changeMyPassword(
             @Valid @RequestBody UserDtos.ChangePasswordRequest request,
             Authentication authentication) {
-        return ResponseEntity.ok(userService.changeMyPassword(authentication.getName(), request));
+        return ResponseEntity.ok(
+                userService.changeMyPassword(authentication.getName(), request)
+        );
     }
 
     @PostMapping("/me/request-verification")
-    public ResponseEntity<ApiResponse<UserDtos.ProfileResponse>> requestVerification(Authentication authentication) {
-        return ResponseEntity.ok(userService.requestVerification(authentication.getName()));
+    public ResponseEntity<ApiResponse<UserDtos.ProfileResponse>> requestVerification(
+            Authentication authentication) {
+        return ResponseEntity.ok(
+                userService.requestVerification(authentication.getName())
+        );
     }
 
     // ---------- admin only ----------
@@ -66,7 +76,8 @@ public class UserController {
 
     @PutMapping("/{id}/verify")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<AuthDtos.UserSummaryDto>> verifyUser(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<AuthDtos.UserSummaryDto>> verifyUser(
+            @PathVariable Long id) {
         return ResponseEntity.ok(userService.approveVerification(id));
     }
 
@@ -75,7 +86,43 @@ public class UserController {
     public ResponseEntity<ApiResponse<AuthDtos.UserSummaryDto>> rejectUser(
             @PathVariable Long id,
             @Valid @RequestBody(required = false) UserDtos.RejectRequest request) {
+
         String reason = request != null ? request.getReason() : null;
-        return ResponseEntity.ok(userService.rejectVerification(id, reason));
+
+        return ResponseEntity.ok(
+                userService.rejectVerification(id, reason)
+        );
+    }
+
+    // ---------- admin user management ----------
+
+    @PutMapping("/{id}/ban")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<AuthDtos.UserSummaryDto>> banUser(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                userService.banUser(id)
+        );
+    }
+
+    @PutMapping("/{id}/unban")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<AuthDtos.UserSummaryDto>> unbanUser(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                userService.unbanUser(id)
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> deleteUser(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                userService.deleteUser(id)
+        );
     }
 }

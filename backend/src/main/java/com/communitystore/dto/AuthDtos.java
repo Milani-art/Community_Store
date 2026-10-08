@@ -72,6 +72,7 @@ public class AuthDtos {
         private Role role;
         private String institutionOrBusiness;
         private boolean verified;
+        private boolean banned;
         private VerificationStatus verificationStatus;
         private double rating;
         private int totalRatings;
@@ -86,6 +87,7 @@ public class AuthDtos {
                     .institutionOrBusiness(user.getInstitutionOrBusiness())
                     .verified(user.isVerified())
                     .verificationStatus(user.getVerificationStatus())
+                    .banned(user.isBanned())
                     .rating(user.getRating())
                     .totalRatings(user.getTotalRatings())
                     .build();
